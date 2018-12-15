@@ -1,0 +1,138 @@
+# !/bin/bash
+
+################################## GLOBAL VAR ##################################
+#
+# force check MCP config
+#if [[ ! $2 = eng ]]; then
+#ForcePreCheck=1
+#fi
+export TOP_PWD=`pwd`
+export UBOOT_BASE_BOARD_NAME=$1
+
+PARAMETER_LEN=$#
+if [[ $PARAMETER_LEN -lt 2 ]]; then
+      echo  project name is not set. !! ERROR , exit
+      echo  "Usage:   ./oneCmdMake PROJECT_NAME [user]"
+      echo  "example: ./oneCmdMake origen eng"
+      echo  "      OR ./oneCmdMake vexpress_ca9x4 user"
+      exit
+fi
+
+
+source wdong/envsetup.sh 
+source wdong/auto_build_u_boot.sh 
+
+CFG_FILE_NAME=u-boot-$U_BOOT_VERSION/configs/$1_defconfig
+if [ ! -f $CFG_FILE_NAME ]; then
+	echo -e "\033[31mERROR: oneCmdMake\033[0m"
+	echo -e "\033[31mERROR: $CFG_FILE_NAME not exist, pls check in the directory u-boot-$U_BOOT_VERSION/configs/\033[0m"
+    exit
+else
+	echo -e "\033[32m$CFG_FILE_NAME\033[0m"
+fi
+
+#MAKEFILE_COMPILE_VAR=CUSTOM_CONFIG_MAX_DRAM_SIZE
+#outbuf=$(./get_string $CFG_FILE_NAME $MAKEFILE_COMPILE_VAR)
+#MAX_DRAM_SIZE=$outbuf
+#MAKEFILE_COMPILE_VAR=MTK_K64_SUPPORT
+#outbuf=$(./get_string $CFG_FILE_NAME $MAKEFILE_COMPILE_VAR)
+#if [[ $MAX_DRAM_SIZE == "0x20000000" ]]; then
+#    CUSTOM_BASE_PRJ=bird6739tv1_bsp_512
+#elif [[ $MAX_DRAM_SIZE == "0x40000000" ]]; then
+#    CUSTOM_BASE_PRJ=bird6739tv1_bsp_1g
+#else
+#    if [[ $outbuf == "yes" ]]; then
+#	CUSTOM_BASE_PRJ=bird6739tv1_64_bsp
+#    else
+#	CUSTOM_BASE_PRJ=bird6739tv1_bsp
+#    fi
+#fi
+#echo CUSTOM_BASE_PRJ=$CUSTOM_BASE_PRJ
+#
+#if [[ -n $CUSTOM_BASE_PRJ ]]; then
+#    echo $CUSTOM_BASE_PRJ > bird/tool/buildprojectname.txt # record built project name
+#fi
+#echo CUSTOM_BASE_PRJ=$CUSTOM_BASE_PRJ
+#
+#if [[ $2 = eng ]]; then
+#	echo -e "\033[32mlunch full_${CUSTOM_BASE_PRJ}-eng\033[0m"
+#    lunch full_${CUSTOM_BASE_PRJ}-eng
+#elif [[ $2 = user ]]; then
+#	echo -e "\033[32mlunch full_${CUSTOM_BASE_PRJ}-user\033[0m"
+#    lunch full_${CUSTOM_BASE_PRJ}-user
+#elif [[ $2 = userdebug ]]; then
+#	echo -e "\033[32mlunch full_${CUSTOM_BASE_PRJ}-userdebug\033[0m"
+#    lunch full_${CUSTOM_BASE_PRJ}-userdebug
+#else
+#    echo -e "\033[31mERROR: oneCmdMake second parameter illegal !!!\033[0m"
+#    exit
+#fi
+#
+##lvhuaiyi add for otapackage begin
+#autoMakeOTA=$(./get_string $CFG_FILE_NAME BIRD_AUTO_MAKE_OTA)
+#MAKE_OTA=n
+#if [[ $2 = eng ]]; then
+#    echo "eng mode no otapackage auto made, ignore"
+#elif [[ $autoMakeOTA == "yes" ]]; then  
+#    MAKE_OTA=y
+#    echo "========!!!!!!!!!!!!!!!!========"
+#    echo "BIRD_AUTO_MAKE_OTA=yes, auto make ota by makefile"
+#    echo "       "
+#elif [[ $autoMakeOTA == "no" ]]; then  
+#    MAKE_OTA=n
+#    echo "========!!!!!!!!!!!!!!!!========"
+#    echo "BIRD_AUTO_MAKE_OTA=no, ignore make ota by makefile"
+#    echo "       "    
+#else
+#    echo "========!!!!!!!!!!!!!!!!========"
+#    echo "Luxujun demand SPL must do this:"
+#    echo "the otapackage should be made for Production Version."
+#    echo "Any question, please ask Luxujun/Yanwangjun/Lvhuaiyi for help"
+#    while :; do
+#    echo  "      Press I  to ignore the warning if u no make ota"
+#    echo  "      Press Y to make ota, u should do"
+#    read -p "Make your choise: " -n 1 keypress
+#    echo
+#            if [ $keypress = i -o $keypress = I ]; then
+#                MAKE_OTA=n
+#                break
+#            fi
+#            if [ $keypress = y -o $keypress = Y ]; then
+#                MAKE_OTA=y
+#                break
+#            fi
+#    done
+#fi
+##lvhuaiyi add for otapackage end
+#
+#source mbldenv.sh 
+#
+##copy file
+#source birdCopy $1 $2
+#
+#source bird/tool/sh/handle_before_make
+
+echo "debugging exit"
+exit
+#outbuf=out/casecheck.txt
+#if [[ ! -f $outbuf ]]; then
+#make -j8 update-api 2>&1 |tee update-api.log
+#fi
+#
+#if [ -f "out/target/product/$CUSTOM_BASE_PRJ/obj/ETC/system_build_prop_intermediates/build.prop" ]; then
+#cp -f out/target/product/$CUSTOM_BASE_PRJ/system/build.prop out/target/product/$CUSTOM_BASE_PRJ/system/build.prop.bak
+#rm -f out/target/product/$CUSTOM_BASE_PRJ/obj/ETC/system_build_prop_intermediates/build.prop
+#fi
+#
+#make -j8  2>&1 |tee total_build.log
+#
+##lvhuaiyi add for otapackage begin
+#if [[ $MAKE_OTA == "y" ]]; then
+#    make -j8 otapackage 2>&1 |tee otapackage.log
+#    #mv out/target/product/$PROJECT_NAME/preloader_bird*.bin out/target/product/$PROJECT_NAME/preloader.bin
+#    #sed -i "s/preloader_$PROJECT_NAME/preloader/" out/target/product/$PROJECT_NAME/$SCATTERFILE_NAME
+#    ls -t out/target/product/$PROJECT_NAME/obj/PACKAGING/target_files_intermediates/full_$PROJECT_NAME-target_files-*.zip | head -n 1 | xargs -i cp {} out/target/product/$PROJECT_NAME/ota_target_files.zip
+#fi
+##lvhuaiyi add for otapackage end
+#
+#source bird/tool/sh/handle_after_make
