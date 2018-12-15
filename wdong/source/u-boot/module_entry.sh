@@ -34,19 +34,23 @@ function download_u-boot()
   cd ${SCRIPT_DIRNAME}
   #echo "PWD:$PWD  OLDPWD:$OLDPWD"
   echo "download!!!"
-  if [ -e u-boot-${U_BOOT_VERSION}.tar.bz2 ]
-  then 
-    echo u-boot-${U_BOOT_VERSION}.tar.bz2 exist
-  else 
-    echo downloading
-    wget http://ftp.denx.de/pub/u-boot/u-boot-${U_BOOT_VERSION}.tar.bz2
-  fi
 
   if [ -e $TOP_PWD/u-boot-${U_BOOT_VERSION} ]
   then 
     echo u-boot-${U_BOOT_VERSION} exist
   else 
-    tar -jxf u-boot-${U_BOOT_VERSION}.tar.bz2 -C $TOP_PWD/
+    if [ -e u-boot-${U_BOOT_VERSION}.tar.bz2 ]
+      then 
+        echo u-boot-${U_BOOT_VERSION}.tar.bz2 exist
+      else 
+        echo downloading
+        wget http://ftp.denx.de/pub/u-boot/u-boot-${U_BOOT_VERSION}.tar.bz2
+        if  [ $? -eq 0 ]; then 
+          tar -jxf u-boot-${U_BOOT_VERSION}.tar.bz2 -C $TOP_PWD/
+        else 
+          echo "wget failed!!!"
+        fi
+    fi
   fi
 
   cd $OLDPWD
