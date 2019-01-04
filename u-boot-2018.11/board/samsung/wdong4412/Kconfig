@@ -1,0 +1,12 @@
+if TARGET_WDONG4412
+
+config SYS_BOARD
+	default "wdong4412"
+
+config SYS_VENDOR
+	default "samsung"
+
+config SYS_CONFIG_NAME
+	default "wdong4412"
+
+endif

@@ -1,0 +1,6 @@
+ORIGEN BOARD
+M:	wdd7xi <wdd7xi@163.com>
+S:	Maintained
+F:	board/samsung/wdong4412/
+F:	include/configs/wdong4412.h
+F:	configs/wdong4412_defconfig
